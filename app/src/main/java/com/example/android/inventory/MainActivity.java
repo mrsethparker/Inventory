@@ -2,20 +2,19 @@ package com.example.android.inventory;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.provider.BaseColumns;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-import com.example.android.inventory.data.ItemContract.ItemEntry;
 
-import com.example.android.inventory.data.ItemDbHelper;
+import com.example.android.inventory.data.ProductContract.ProductEntry;
+import com.example.android.inventory.data.ProductDbHelper;
 
 public class MainActivity extends AppCompatActivity {
 
-    private ItemDbHelper dbHelper;
+    private ProductDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dbHelper = new ItemDbHelper(this);
+        dbHelper = new ProductDbHelper(this);
         readDb();
 
     }
@@ -45,47 +44,37 @@ public class MainActivity extends AppCompatActivity {
 
     private void readDb() {
 
-        //create and/or open our database so that we can read from it
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-
         //set up our SQL query
         String[] projection = {
                 BaseColumns._ID,
-                ItemEntry.COLUMN_PRODUCT_NAME,
-                ItemEntry.COLUMN_PRICE,
-                ItemEntry.COLUMN_QUANTITY,
-                ItemEntry.COLUMN_SUPPLIER_NAME,
-                ItemEntry.COLUMN_SUPPLIER_PHONE_NUMBER};
+                ProductEntry.COLUMN_PRODUCT_NAME,
+                ProductEntry.COLUMN_PRICE,
+                ProductEntry.COLUMN_QUANTITY,
+                ProductEntry.COLUMN_SUPPLIER_NAME,
+                ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER};
 
         TextView displayView = (TextView) findViewById(R.id.text_view_test);
 
         //query our database
         //NOTE: no need to manually close our cursor when we're done since we're making use of automatic resource management
-        try (Cursor cursor = db.query(
-                ItemEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null)) {
+        try (Cursor cursor = getContentResolver().query(ProductEntry.CONTENT_URI, projection, null, null, null);) {
             //display our database rows
             displayView.setText(R.string.rows_header_text);
             displayView.append(cursor.getCount() + "\n\n" +
-                    ItemEntry._ID + " | " +
-                    ItemEntry.COLUMN_PRODUCT_NAME + " | " +
-                    ItemEntry.COLUMN_PRICE + " | " +
-                    ItemEntry.COLUMN_QUANTITY + " | " +
-                    ItemEntry.COLUMN_SUPPLIER_NAME + " | " +
-                    ItemEntry.COLUMN_SUPPLIER_PHONE_NUMBER + "\n");
+                    ProductEntry._ID + " | " +
+                    ProductEntry.COLUMN_PRODUCT_NAME + " | " +
+                    ProductEntry.COLUMN_PRICE + " | " +
+                    ProductEntry.COLUMN_QUANTITY + " | " +
+                    ProductEntry.COLUMN_SUPPLIER_NAME + " | " +
+                    ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER + "\n");
 
             //figure out the column indices of our table
-            int idColumnIndex = cursor.getColumnIndex(ItemEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_PRODUCT_NAME);
-            int priceColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_PRICE);
-            int qtyColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_QUANTITY);
-            int supplierNameColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_SUPPLIER_NAME);
-            int supplierPhoneColumnIndex = cursor.getColumnIndex(ItemEntry.COLUMN_SUPPLIER_PHONE_NUMBER);
+            int idColumnIndex = cursor.getColumnIndex(ProductEntry._ID);
+            int nameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME);
+            int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRICE);
+            int qtyColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_QUANTITY);
+            int supplierNameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_SUPPLIER_NAME);
+            int supplierPhoneColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER);
 
             //loop through all the rows in our cursor
             while (cursor.moveToNext()) {

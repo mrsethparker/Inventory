@@ -9,4 +9,6 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="rows_header_text">Number of rows in our Product table:</string>
+    <string name="productSaveError">Error with saving product</string>
+    <string name="productSaved">Product saved.</string>
 </resources>

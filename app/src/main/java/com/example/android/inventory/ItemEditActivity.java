@@ -1,17 +1,17 @@
 package com.example.android.inventory;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.android.inventory.data.ItemContract.ItemEntry;
-import com.example.android.inventory.data.ItemDbHelper;
+import com.example.android.inventory.data.ProductContract.ProductEntry;
+import com.example.android.inventory.data.ProductDbHelper;
 
 public class ItemEditActivity extends AppCompatActivity {
 
@@ -31,7 +31,7 @@ public class ItemEditActivity extends AppCompatActivity {
     private EditText supplierPhone;
 
     //our database helper
-    private ItemDbHelper dbHelper;
+    private ProductDbHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,32 +45,28 @@ public class ItemEditActivity extends AppCompatActivity {
         supplierName = (EditText) findViewById(R.id.supplier_name);
         supplierPhone = (EditText) findViewById(R.id.supplier_phone);
 
-        dbHelper = new ItemDbHelper(this);
     }
 
     private void insertItem(){
 
-        //get our database in write mode
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         //create a new map of our values
         ContentValues values = new ContentValues();
 
-        values.put(ItemEntry.COLUMN_PRODUCT_NAME, productName.getText().toString().trim());
-        values.put(ItemEntry.COLUMN_PRICE, Double.parseDouble(productPrice.getText().toString().trim()));
-        values.put(ItemEntry.COLUMN_QUANTITY, Integer.parseInt(productQuantity.getText().toString().trim()));
-        values.put(ItemEntry.COLUMN_SUPPLIER_NAME, supplierName.getText().toString().trim());
-        values.put(ItemEntry.COLUMN_SUPPLIER_PHONE_NUMBER, supplierPhone.getText().toString().trim());
+        values.put(ProductEntry.COLUMN_PRODUCT_NAME, productName.getText().toString().trim());
+        values.put(ProductEntry.COLUMN_PRICE, Double.parseDouble(productPrice.getText().toString().trim()));
+        values.put(ProductEntry.COLUMN_QUANTITY, Integer.parseInt(productQuantity.getText().toString().trim()));
+        values.put(ProductEntry.COLUMN_SUPPLIER_NAME, supplierName.getText().toString().trim());
+        values.put(ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER, supplierPhone.getText().toString().trim());
 
-        //insert our new row and get the primary key of that row
-        long newRowId = db.insert(ItemEntry.TABLE_NAME, null, values);
+        //insert our new row
+        Uri newUri = getContentResolver().insert(ProductEntry.CONTENT_URI, values);
 
         //display a toast indicating if our insert was successful or not
-        if(newRowId == -1){
-            Toast toast = Toast.makeText(getApplicationContext(), "Error with saving product", Toast.LENGTH_SHORT);
+        if (newUri == null) {
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.productSaveError, Toast.LENGTH_SHORT);
             toast.show();
         }else{
-            Toast toast = Toast.makeText(getApplicationContext(), "Product saved with ID " + newRowId, Toast.LENGTH_SHORT);
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.productSaved, Toast.LENGTH_SHORT);
             toast.show();
         }
     }
