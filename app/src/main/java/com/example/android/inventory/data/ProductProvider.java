@@ -58,7 +58,6 @@ public class ProductProvider extends ContentProvider {
                 cursor = database.query(ProductEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
-
             case PRODUCT_ID:
                 //extract the ID from the URI then query our database looking for that ID
                 selection = ProductEntry._ID + "=?";
@@ -66,11 +65,14 @@ public class ProductProvider extends ContentProvider {
                 cursor = database.query(ProductEntry.TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
-
             default:
                 throw new IllegalArgumentException("We can't query with the unknown URI " + uri);
         }
 
+        //set the notification URI on our cursor
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        //return our cursor
         return cursor;
     }
 
@@ -112,19 +114,31 @@ public class ProductProvider extends ContentProvider {
         //get a writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
+        //number of rows that were deleted
+        int rowsDeleted;
+
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case PRODUCTS:
                 //delete all rows that match the selection and selection args
-                return database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             case PRODUCT_ID:
                 //delete a single row given by the ID in the URI
                 selection = ProductEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                return database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(ProductEntry.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 throw new IllegalArgumentException("Deletion isn't supported for " + uri);
         }
+
+        //if any rows were successfully deleted then notify our listeners
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsDeleted;
     }
 
     //returns the MIME type of data for our content URI
@@ -185,6 +199,9 @@ public class ProductProvider extends ContentProvider {
             return null;
         }
 
+        //notify our listeners that the data has changed
+        getContext().getContentResolver().notifyChange(uri, null);
+
         //now we know the ID of the new row so return the new URI with the ID appended
         return ContentUris.withAppendedId(uri, newRowId);
     }
@@ -230,7 +247,14 @@ public class ProductProvider extends ContentProvider {
         //get our database in write mode
         SQLiteDatabase db = mDbHelper.getWritableDatabase();
 
-        //update the db and return the number of rows that were affected by our update
-        return db.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
+        //update the db and get the number of rows that were affected by our update
+        int rowsUpdated = db.update(ProductEntry.TABLE_NAME, values, selection, selectionArgs);
+
+        //if any rows were updated then notify our listeners
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        return rowsUpdated;
     }
 }

@@ -1,20 +1,27 @@
 package com.example.android.inventory;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.ListView;
 
 import com.example.android.inventory.data.ProductContract.ProductEntry;
-import com.example.android.inventory.data.ProductDbHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ProductDbHelper dbHelper;
+    //loader ID for our product loader
+    private static final int PRODUCT_LOADER = 0;
+
+    //our product cursorAdapter
+    private ProductCursorAdapter cursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,69 +38,57 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        dbHelper = new ProductDbHelper(this);
-        readDb();
+        //find the listview to display our products
+        ListView displayView = (ListView) findViewById(R.id.list);
+
+        //find and set empty view on the ListView, so that it only shows when the list has 0 items
+        View emptyView = findViewById(R.id.empty_view);
+        displayView.setEmptyView(emptyView);
+
+        //setup our adapter and attach it to our ListView
+        cursorAdapter = new ProductCursorAdapter(this, null);
+        displayView.setAdapter(cursorAdapter);
+
+        //start the loader
+        getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        readDb();
     }
 
-    private void readDb() {
 
-        //set up our SQL query
+    @NonNull
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, @Nullable Bundle args) {
+
+        //set up our projection to specify the table columns we want
         String[] projection = {
-                BaseColumns._ID,
+                ProductEntry._ID,
                 ProductEntry.COLUMN_PRODUCT_NAME,
                 ProductEntry.COLUMN_PRICE,
-                ProductEntry.COLUMN_QUANTITY,
-                ProductEntry.COLUMN_SUPPLIER_NAME,
-                ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER};
+                ProductEntry.COLUMN_QUANTITY};
 
-        TextView displayView = (TextView) findViewById(R.id.text_view_test);
+        //create a loader to execute the ContentProvider query on a background thread
+        return new CursorLoader(this,
+                ProductEntry.CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
+    }
 
-        //query our database
-        //NOTE: no need to manually close our cursor when we're done since we're making use of automatic resource management
-        try (Cursor cursor = getContentResolver().query(ProductEntry.CONTENT_URI, projection, null, null, null);) {
-            //display our database rows
-            displayView.setText(R.string.rows_header_text);
-            displayView.append(cursor.getCount() + "\n\n" +
-                    ProductEntry._ID + " | " +
-                    ProductEntry.COLUMN_PRODUCT_NAME + " | " +
-                    ProductEntry.COLUMN_PRICE + " | " +
-                    ProductEntry.COLUMN_QUANTITY + " | " +
-                    ProductEntry.COLUMN_SUPPLIER_NAME + " | " +
-                    ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER + "\n");
+    @Override
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
+        //update the product CursorAdapter with the queried product data
+        cursorAdapter.swapCursor(data);
+    }
 
-            //figure out the column indices of our table
-            int idColumnIndex = cursor.getColumnIndex(ProductEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRODUCT_NAME);
-            int priceColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_PRICE);
-            int qtyColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_QUANTITY);
-            int supplierNameColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_SUPPLIER_NAME);
-            int supplierPhoneColumnIndex = cursor.getColumnIndex(ProductEntry.COLUMN_SUPPLIER_PHONE_NUMBER);
-
-            //loop through all the rows in our cursor
-            while (cursor.moveToNext()) {
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentName = cursor.getString(nameColumnIndex);
-                double currentPrice = cursor.getDouble(priceColumnIndex);
-                int currentQty = cursor.getInt(qtyColumnIndex);
-                String currentSupplierName = cursor.getString(supplierNameColumnIndex);
-                String currentSupplierPhone = cursor.getString(supplierPhoneColumnIndex);
-
-                //display the values from each column of the current row in our cursor in our TextView
-                displayView.append("\n" +
-                        currentID + "-" +
-                        currentName + "-" +
-                        currentPrice + "-" +
-                        currentQty + "-" +
-                        currentSupplierName + "-" +
-                        currentSupplierPhone);
-            }
-        }
+    @Override
+    public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+        //delete our cursor data
+        cursorAdapter.swapCursor(null);
     }
 }
