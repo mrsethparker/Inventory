@@ -11,4 +11,13 @@
     <string name="rows_header_text">Number of rows in our Product table:</string>
     <string name="productSaveError">Error with saving product</string>
     <string name="productSaved">Product saved.</string>
+    <string name="productUpdateError">Error Updating Pet</string>
+    <string name="productUpdated">Product Updated.</string>
+    <string name="discardMessage">Would you like to discard your changes and quit editing?</string>
+    <string name="discard">Discard</string>
+    <string name="continueEditing">Continue Editing</string>
+    <string name="deleteConfirmMessage">Are you sure you want to delete this product?</string>
+    <string name="cancel">Cancel</string>
+    <string name="deleteFailed">Couldn\'t delete this product.</string>
+    <string name="deleteSuccess">Sucessfully deleted product.</string>
 </resources>

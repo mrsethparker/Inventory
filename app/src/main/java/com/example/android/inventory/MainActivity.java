@@ -1,6 +1,7 @@
 package com.example.android.inventory;
 
 import android.app.LoaderManager;
+import android.content.ContentUris;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -11,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.inventory.data.ProductContract.ProductEntry;
@@ -39,15 +41,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
         //find the listview to display our products
-        ListView displayView = (ListView) findViewById(R.id.list);
+        ListView productListView = (ListView) findViewById(R.id.list);
 
         //find and set empty view on the ListView, so that it only shows when the list has 0 items
         View emptyView = findViewById(R.id.empty_view);
-        displayView.setEmptyView(emptyView);
+        productListView.setEmptyView(emptyView);
 
         //setup our adapter and attach it to our ListView
         cursorAdapter = new ProductCursorAdapter(this, null);
-        displayView.setAdapter(cursorAdapter);
+        productListView.setAdapter(cursorAdapter);
+
+        //setup an item click listener on our product list
+        productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
+                //create a new intent to open the ItemEditActivity
+                Intent intent = new Intent(MainActivity.this, ItemEditActivity.class);
+
+                //set the URI of the clicked product on the intent's data field
+                intent.setData(ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id));
+
+                //launch the ItemEditActivity so that we can display the current product's data
+                startActivity(intent);
+            }
+        });
 
         //start the loader
         getLoaderManager().initLoader(PRODUCT_LOADER, null, this);
