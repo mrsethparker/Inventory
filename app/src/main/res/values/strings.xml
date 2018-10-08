@@ -20,4 +20,5 @@
     <string name="cancel">Cancel</string>
     <string name="deleteFailed">Couldn\'t delete this product.</string>
     <string name="deleteSuccess">Sucessfully deleted product.</string>
+    <string name="order_button_text">Order</string>
 </resources>

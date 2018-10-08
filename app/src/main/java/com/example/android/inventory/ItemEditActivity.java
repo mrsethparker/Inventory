@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -100,6 +101,28 @@ public class ItemEditActivity extends AppCompatActivity implements
         supplierNameEditText.setOnTouchListener(productTouchListener);
         supplierPhoneEditText.setOnTouchListener(productTouchListener);
 
+        //only show the order button on the existing products
+        if (currentProductUri != null) {
+            //find the order button and make it visible
+            final Button orderButton = (Button) findViewById(R.id.order_button);
+            orderButton.setVisibility(View.VISIBLE);
+
+            //set a click listener on the order button
+            orderButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    //find the supplier phone number
+                    EditText supplierPhoneView = findViewById(R.id.supplier_phone);
+                    String supplierPhone = supplierPhoneView.getText().toString();
+
+                    //create a new intent with the supplier phone number and open a dialer app
+                    Intent dialIntent = new Intent();
+                    dialIntent.setAction(Intent.ACTION_DIAL);
+                    dialIntent.setData(Uri.parse("tel:" + supplierPhone));
+                    startActivity(dialIntent);
+                }
+            });
+        }
     }
 
     @Override
@@ -127,22 +150,10 @@ public class ItemEditActivity extends AppCompatActivity implements
     private void saveItem() {
 
         String productNameString = productNameEditText.getText().toString().trim();
-        Double productPriceValue = Double.parseDouble(productPriceEditText.getText().toString().trim());
-        Integer productQuantityValue = Integer.parseInt(productQuantityEditText.getText().toString().trim());
+        String productPriceValue = productPriceEditText.getText().toString().trim();
+        String productQuantityValue = productQuantityEditText.getText().toString().trim();
         String supplierNameString = supplierNameEditText.getText().toString().trim();
         String supplierPhoneString = supplierPhoneEditText.getText().toString().trim();
-
-        // TODO: update to check if the individual fields are empty and handle gracefully;
-
-        //check if this is supposed to be a new product and if all the editor fields are blank
-        //if so, then don't do anything and return to the main activity
-        if (currentProductUri == null &&
-                TextUtils.isEmpty(productNameString) && productPriceValue == null &&
-                productQuantityValue == null && TextUtils.isEmpty(supplierNameString) &&
-                TextUtils.isEmpty(supplierPhoneString)) {
-            //nothing was modified so just return without any action
-            return;
-        }
 
         //create a new map of our values
         ContentValues values = new ContentValues();
@@ -208,11 +219,14 @@ public class ItemEditActivity extends AppCompatActivity implements
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.save_action:
-                //save product
-                saveItem();
-                //exit activity
-                finish();
-                return true;
+                if (validateInput()) {
+                    //save product
+                    saveItem();
+                    //exit activity
+                    finish();
+                    return true;
+                }
+                break;
             // Respond to a click on the "Delete" menu option
             case R.id.delete_action:
                 //show a dialog to confirm deletion
@@ -370,5 +384,65 @@ public class ItemEditActivity extends AppCompatActivity implements
 
         //close the activity
         finish();
+    }
+
+    //make sure that all of the user input is valid
+    private boolean validateInput() {
+
+        //get the input values
+        String productNameString = productNameEditText.getText().toString().trim();
+        String productPriceValue = productPriceEditText.getText().toString().trim();
+        String productQuantityValue = productQuantityEditText.getText().toString().trim();
+        String supplierNameString = supplierNameEditText.getText().toString().trim();
+        String supplierPhoneString = supplierPhoneEditText.getText().toString().trim();
+
+        //indicates if there are errors or not
+        boolean noErrors = true;
+
+        //the error message we'll display
+        String invalidMessage;
+
+        //the error details we'll display
+        StringBuilder errors = new StringBuilder();
+
+        //check for a valid product name
+        if (TextUtils.isEmpty(productNameString)) {
+            noErrors = false;
+            errors.append("\nProduct Name");
+        }
+
+        //check for a valid product price
+        if (TextUtils.isEmpty(productPriceValue)) {
+            noErrors = false;
+            errors.append("\nProduct Price");
+        }
+
+        //check for a valid product quantity
+        if (TextUtils.isEmpty(productQuantityValue)) {
+            noErrors = false;
+            errors.append("\nProduct Quantity");
+        }
+
+        //check for a valid supplier name
+        if (TextUtils.isEmpty(supplierNameString)) {
+            noErrors = false;
+            errors.append("\nSupplier Name");
+        }
+
+        //check for a valid supplier phone
+        if (TextUtils.isEmpty(supplierPhoneString)) {
+            noErrors = false;
+            errors.append("\nSupplier Phone");
+        }
+
+        //build the complete error message and show it in a Toast
+        if (!noErrors) {
+            invalidMessage = "The following fields are required but you left them blank:";
+            Toast toast = Toast.makeText(getApplicationContext(), invalidMessage + errors.toString(), Toast.LENGTH_SHORT);
+            toast.show();
+
+        }
+
+        return noErrors;
     }
 }
