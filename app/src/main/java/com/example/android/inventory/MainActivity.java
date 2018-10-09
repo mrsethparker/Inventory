@@ -2,10 +2,12 @@ package com.example.android.inventory;
 
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.android.inventory.data.ProductContract.ProductEntry;
 
@@ -51,10 +54,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         cursorAdapter = new ProductCursorAdapter(this, null);
         productListView.setAdapter(cursorAdapter);
 
+
         //setup an item click listener on our product list
         productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+
 
                 //create a new intent to open the ItemEditActivity
                 Intent intent = new Intent(MainActivity.this, ItemEditActivity.class);
@@ -108,5 +113,31 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         //delete our cursor data
         cursorAdapter.swapCursor(null);
+    }
+
+    //record a product sale and update the quantity in our database
+    public void recordSale(int id, int quantity) {
+
+        //update the quantity
+        int updatedQuantity = quantity - 1;
+
+        //get a URI for the product we're updating
+        Uri saleUri = ContentUris.withAppendedId(ProductEntry.CONTENT_URI, id);
+
+        //create a new ContentValues and add the quantity
+        ContentValues values = new ContentValues();
+        values.put(ProductEntry.COLUMN_QUANTITY, updatedQuantity);
+
+        //try to update our database
+        int rowsUpdated = getContentResolver().update(saleUri, values, null, null);
+
+        //show a toast message indicating if our update was successful or not
+        if (rowsUpdated == 0) {
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.product_update_error, Toast.LENGTH_SHORT);
+            toast.show();
+        } else {
+            Toast toast = Toast.makeText(getApplicationContext(), R.string.product_updated, Toast.LENGTH_SHORT);
+            toast.show();
+        }
     }
 }

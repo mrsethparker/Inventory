@@ -38,15 +38,13 @@
         app:layout_constraintTop_toBottomOf="@+id/item" />
 
     <EditText
-        android:importantForAutofill="no"
         android:id="@+id/quantity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/default_margin"
-        android:layout_marginStart="@dimen/default_margin"
         android:layout_marginTop="@dimen/default_margin"
         android:ems="10"
         android:hint="@string/quantity"
+        android:importantForAutofill="no"
         android:inputType="number"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -86,10 +84,34 @@
         android:id="@+id/order_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/default_margin"
         android:text="@string/order_button_text"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/supplier_phone" />
+
+    <Button
+        android:id="@+id/minus_button"
+        android:layout_width="@dimen/width_margin"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/default_margin"
+        android:layout_marginTop="@dimen/narrow_margin"
+        android:layout_marginEnd="@dimen/wide_margin"
+        android:text="@string/minus_button_label"
+        app:layout_constraintEnd_toStartOf="@+id/quantity"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
+
+    <Button
+        android:id="@+id/plus_button"
+        android:layout_width="@dimen/width_margin"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/wide_margin"
+        android:layout_marginTop="@dimen/narrow_margin"
+        android:layout_marginEnd="@dimen/default_margin"
+        android:text="@string/plus_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/quantity"
+        app:layout_constraintTop_toBottomOf="@+id/price" />
 </android.support.constraint.ConstraintLayout>

@@ -23,6 +23,8 @@ import android.widget.Toast;
 
 import com.example.android.inventory.data.ProductContract.ProductEntry;
 
+import java.text.NumberFormat;
+
 //allows a user to create a new product or edit an existing product
 public class ItemEditActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -123,6 +125,42 @@ public class ItemEditActivity extends AppCompatActivity implements
                 }
             });
         }
+
+        final Button minusButton = (Button) findViewById(R.id.minus_button);
+        minusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText quantityView = findViewById(R.id.quantity);
+
+                if (TextUtils.isEmpty(quantityView.getText().toString())) {
+                    quantityView.setText("0");
+                } else {
+                    int quantity = Integer.parseInt(quantityView.getText().toString());
+                    if (quantity >= 1) {
+                        quantity -= 1;
+                        quantityView.setText(String.format(getResources().getConfiguration().locale, "%d", quantity));
+                    }
+                }
+
+            }
+        });
+
+        final Button plusButton = (Button) findViewById(R.id.plus_button);
+        plusButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText quantityView = findViewById(R.id.quantity);
+
+                if (TextUtils.isEmpty(quantityView.getText().toString())) {
+                    quantityView.setText("1");
+                } else {
+                    int quantity = Integer.parseInt(quantityView.getText().toString());
+                    quantity += 1;
+                    quantityView.setText(String.format(getResources().getConfiguration().locale, "%d", quantity));
+                }
+
+            }
+        });
     }
 
     @Override
@@ -171,22 +209,22 @@ public class ItemEditActivity extends AppCompatActivity implements
 
             //display a toast indicating if our insert was successful or not
             if (newUri == null) {
-                Toast toast = Toast.makeText(getApplicationContext(), R.string.productSaveError, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.product_save_error, Toast.LENGTH_SHORT);
                 toast.show();
             } else {
-                Toast toast = Toast.makeText(getApplicationContext(), R.string.productSaved, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.product_saved, Toast.LENGTH_SHORT);
                 toast.show();
             }
         } else {
-            //existing pet so update it's info
+            //existing product so update it's info
             int rowsUpdated = getContentResolver().update(currentProductUri, values, null, null);
 
             //show a toast message indicating if our update was successful or not
             if (rowsUpdated == 0) {
-                Toast toast = Toast.makeText(getApplicationContext(), R.string.productUpdateError, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.product_update_error, Toast.LENGTH_SHORT);
                 toast.show();
             } else {
-                Toast toast = Toast.makeText(getApplicationContext(), R.string.productUpdated, Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), R.string.product_updated, Toast.LENGTH_SHORT);
                 toast.show();
             }
         }
@@ -300,10 +338,13 @@ public class ItemEditActivity extends AppCompatActivity implements
             String supplierName = cursor.getString(supplierNameColumnIndex);
             String supplierPhone = cursor.getString(supplierPhoneColumnIndex);
 
+            //get a locale specific currency number format so that we can display the price properly
+            NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(getResources().getConfiguration().locale);
+
             //update our views on screen with the database values
             productNameEditText.setText(productName);
-            productPriceEditText.setText(Double.toString(productPrice));
-            productQuantityEditText.setText(Integer.toString(quantity));
+            productPriceEditText.setText(currencyFormatter.format(productPrice));
+            productQuantityEditText.setText(String.format(getResources().getConfiguration().locale, "%d", quantity));
             supplierNameEditText.setText(supplierName);
             supplierPhoneEditText.setText(supplierPhone);
         }
@@ -324,9 +365,9 @@ public class ItemEditActivity extends AppCompatActivity implements
             DialogInterface.OnClickListener discardButtonClickListener) {
         //create an alert dialog then set the alert message and click listeners
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.discardMessage);
+        builder.setMessage(R.string.discard_message);
         builder.setPositiveButton(R.string.discard, discardButtonClickListener);
-        builder.setNegativeButton(R.string.continueEditing, new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.continue_editing, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //user wants to continue editing so dismiss the alert and continue the activity
                 if (dialog != null) {
@@ -344,7 +385,7 @@ public class ItemEditActivity extends AppCompatActivity implements
     private void showDeleteConfirmationDialog() {
         //create an alert dialog then set the alert message and click listeners
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage(R.string.deleteConfirmMessage);
+        builder.setMessage(R.string.delete_confirm_message);
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //user confirmed deletion so proceed
@@ -374,10 +415,10 @@ public class ItemEditActivity extends AppCompatActivity implements
 
             //show a toast indicating whether or not the deletion was successful
             if (rowsDeleted == 0) {
-                Toast.makeText(this, getString(R.string.deleteFailed),
+                Toast.makeText(this, getString(R.string.delete_failed),
                         Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, getString(R.string.deleteSuccess),
+                Toast.makeText(this, getString(R.string.delete_success),
                         Toast.LENGTH_SHORT).show();
             }
         }

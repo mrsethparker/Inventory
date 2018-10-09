@@ -11,6 +11,8 @@ import android.util.Log;
 
 import com.example.android.inventory.data.ProductContract.ProductEntry;
 
+import java.util.Currency;
+
 //ContentProvider for our Inventory app
 public class ProductProvider extends ContentProvider {
 
@@ -216,11 +218,16 @@ public class ProductProvider extends ContentProvider {
         }
 
         if (values.containsKey(ProductEntry.COLUMN_PRICE)) {
-            Double price = values.getAsDouble(ProductEntry.COLUMN_PRICE);
-            ;
+            //price is currency formatted so remove the currency symbol
+            String priceString = values.getAsString(ProductEntry.COLUMN_PRICE);
+            Double price = Double.parseDouble(priceString.replace(Currency.getInstance(getContext().getResources().getConfiguration().locale).getSymbol(), ""));
             if (price == null) {
                 throw new IllegalArgumentException("Products require a price");
+            } else {
+                values.remove(ProductEntry.COLUMN_PRICE);
+                values.put(ProductEntry.COLUMN_PRICE, price.toString());
             }
+
         }
 
         if (values.containsKey(ProductEntry.COLUMN_QUANTITY)) {

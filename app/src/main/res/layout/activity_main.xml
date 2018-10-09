@@ -31,7 +31,7 @@
             android:id="@+id/empty_list_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="No products. Tap the + icon to add something."
+            android:text="@string/no_products_message"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"

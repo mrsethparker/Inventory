@@ -1,24 +1,82 @@
 <resources>
+    <!-- name of our app -->
     <string name="app_name">Inventory</string>
+
+    <!-- name of a product -->
     <string name="product_name">Product Name</string>
+
+    <!-- price of a product -->
     <string name="price">Price</string>
+
+    <!-- title for adding a new product screen -->
     <string name="edit_item_title">Add a Product</string>
+
+    <!-- quantity of a product -->
     <string name="quantity">Quantity</string>
+
+    <!-- name of a product supplier -->
     <string name="supplier_name">Supplier</string>
+
+    <!-- phone number of a product supplier -->
     <string name="supplier_phone">Supplier Phone</string>
+
+    <!-- label for saving a product -->
     <string name="save">Save</string>
+
+    <!-- label for deleting a product -->
     <string name="delete">Delete</string>
-    <string name="rows_header_text">Number of rows in our Product table:</string>
-    <string name="productSaveError">Error with saving product</string>
-    <string name="productSaved">Product saved.</string>
-    <string name="productUpdateError">Error Updating Pet</string>
-    <string name="productUpdated">Product Updated.</string>
-    <string name="discardMessage">Would you like to discard your changes and quit editing?</string>
+
+    <!-- message for a product save error -->
+    <string name="product_save_error">Error with saving product.</string>
+
+    <!-- message for successfully saving a product -->
+    <string name="product_saved">Product saved.</string>
+
+    <!-- message for a product update error -->
+    <string name="product_update_error">Error updating product.</string>
+
+    <!-- message for sucessfully updating a product -->
+    <string name="product_updated">Product updated.</string>
+
+    <!-- message to confirm discarding product edit changes -->
+    <string name="discard_message">Would you like to discard your changes and quit editing?</string>
+
+    <!-- discard confirmation label -->
     <string name="discard">Discard</string>
-    <string name="continueEditing">Continue Editing</string>
-    <string name="deleteConfirmMessage">Are you sure you want to delete this product?</string>
+
+    <!-- continue editing confirmation label -->
+    <string name="continue_editing">Continue Editing</string>
+
+    <!-- message to confirm deleting a product -->
+    <string name="delete_confirm_message">Are you sure you want to delete this product?</string>
+
+    <!-- cancel confirmation label -->
     <string name="cancel">Cancel</string>
-    <string name="deleteFailed">Couldn\'t delete this product.</string>
-    <string name="deleteSuccess">Sucessfully deleted product.</string>
+
+    <!-- message for product deletion error -->
+    <string name="delete_failed">Couldn\'t delete this product.</string>
+
+    <!-- message for product deletion success -->
+    <string name="delete_success">Successfully deleted product.</string>
+
+    <!-- order button text -->
     <string name="order_button_text">Order</string>
+
+    <!-- message for product out of stock -->
+    <string name="oos_message">Product is out of stock.</string>
+
+    <!-- quantity field label -->
+    <string name="quantity_label">Qty:</string>
+
+    <!-- message indicating no available products -->
+    <string name="no_products_message">No products. Tap the + icon to add something.</string>
+
+    <!-- label for minus (decrease) button -->
+    <string name="minus_button_label">-</string>
+
+    <!-- label for plus (increase) button-->
+    <string name="plus_button">+</string>
+
+    <!-- label for record sale button -->
+    <string name="sale_button_label">Record Sale</string>
 </resources>
